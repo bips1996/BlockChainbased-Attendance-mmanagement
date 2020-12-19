@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+	<style>
+		h1 {
+			text-align: center;
+
+		}
+
+		.mainHeading {
+			font-size: 22px;
+			font-family: 'Times New Roman', Times, serif;
+			font-style: Normal;
+			color: darkblue;
+			font-weight: 100;
+		}
+
+		#addStudent {
+			text-align: center;
+			background-color: brown;
+			height: 330px;
+			width: 400px;
+		}
+
+		#AddStudentHeading {
+			font-size: medium;
+			font-style: italic;
+		}
+
+		#addAttendence {
+			text-align: center;
+			background-color: indianred;
+			height: 200px;
+			width: 400px;
+		}
+
+		#viewAttendence {
+			text-align: center;
+			background-color: orange;
+			height: 200px;
+			width: 400px;
+		}
+
+		#addAdmin {
+			text-align: center;
+			background-color: olivedrab;
+			height: 200px;
+			width: 400px;
+		}
+
+		#viewAdmin {
+			text-align: center;
+			background-color: sienna;
+			height: 200px;
+			width: 400px;
+		}
+
+		label {
+			font-weight: 100;
+		}
+	</style>
+
+
+	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+	<meta content="utf-8" http-equiv="encoding">
+
+	<!-- <script
+	  src="https://code.jquery.com/jquery-3.4.1.js"
+	  integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+	  crossorigin="anonymous"></script>
+     <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.2.6/dist/web3.min.js"></script> -->
+
+	<script src="https://code.jquery.com/jquery-3.4.1.js"
+		integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.2.6/dist/web3.min.js"></script>
+
+
+	<script type="text/javascript">
+		var contract;
+		var address = "0xf8ee3b15bc294860be235bfe038738025e38a1c4";
+
+
+		var abi = [
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "adr",
+				"type": "address"
+			}
+		],
+		"name": "addAdmin",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "int256",
+				"name": "_rollno",
+				"type": "int256"
+			}
+		],
+		"name": "addAttendance",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "int256",
+				"name": "_rollno",
+				"type": "int256"
+			},
+			{
+				"internalType": "string",
+				"name": "_name",
+				"type": "string"
+			},
+			{
+				"internalType": "int256",
+				"name": "_age",
+				"type": "int256"
+			},
+			{
+				"internalType": "string",
+				"name": "_course",
+				"type": "string"
+			},
+			{
+				"internalType": "int256",
+				"name": "_attendance",
+				"type": "int256"
+			}
+		],
+		"name": "addStudent",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "int256",
+				"name": "_rollno",
+				"type": "int256"
+			}
+		],
+		"name": "viewAttendance",
+		"outputs": [
+			{
+				"internalType": "int256",
+				"name": "",
+				"type": "int256"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "int256",
+				"name": "",
+				"type": "int256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "int256",
+				"name": "_rollno",
+				"type": "int256"
+			}
+		],
+		"name": "viewStudent",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "int256",
+						"name": "rollno",
+						"type": "int256"
+					},
+					{
+						"internalType": "string",
+						"name": "name",
+						"type": "string"
+					},
+					{
+						"internalType": "int256",
+						"name": "age",
+						"type": "int256"
+					},
+					{
+						"internalType": "string",
+						"name": "course",
+						"type": "string"
+					},
+					{
+						"internalType": "int256",
+						"name": "attendance",
+						"type": "int256"
+					}
+				],
+				"internalType": "struct Attendance.Student",
+				"name": "",
+				"type": "tuple"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+
+		web3 = new Web3(web3.currentProvider);
+		contract = new web3.eth.Contract(abi, address);
+
+		$(document).ready(function () {
+
+
+			//  $("#_viewStud").click(function()
+			//  {
+			// 	 var rollno = parseInt($("#_rollno2").val());
+			// 	 console.log(rollno) ;
+
+			//      contract.methods.viewAttendance(1).call(function (err, res) {
+			// 		if (err) {
+			// 			console.log("An error occured", err)
+			// 			return
+			// 		}
+			// 		console.log("The rollnumber is: ", res)
+			// 		})
+			//  }
+			//  );
+
+			//Add student
+
+			$("#_addStudent").click(function () {
+				console.log("dbvibsdvn");
+				web3.eth.getAccounts().then(function (accounts) {
+					var acnt = accounts[0];
+					var rollno = $("#_rollno").val();
+					var name = $("#_name").val();
+					var age = $("#_age").val();
+					var course = $("#_course").val();
+					var attendence = $("#_attendence").val();
+					console.log(rollno, name, age, course, attendence);
+
+					return contract.methods.addStudent(rollno, name, age, course, attendence).send({ from: acnt })
+						.then(function (trx) {
+							console.log(trx);
+							alert("Successfully added");
+
+							$("#_rollno").val(" ");
+							$("#_name").val(" ");
+							$("#_age").val(" ");
+							$("#_course").val(" ");
+							$("#_attendence").val(" ");
+						});
+
+				})
+			})
+
+			//View Student
+			$("#_viewStudent").click(function () {
+				var rollno = parseInt($("#_rollno").val());
+				console.log(rollno);
+				contract.methods.viewStudent(rollno).call(function (err, res) {
+					if (err) {
+						console.log("An error occured", err)
+						return
+					}
+					console.log("The rollnumber is: ", res);
+					$("#_rollno").val(res[0]);
+					$("#_name").val(res[1]);
+					$("#_age").val(res[2]);
+					$("#_course").val(res[3]);
+					$("#_attendence").val(res[4]);
+				})
+			}
+
+			);
+
+
+			$("#_addAttendence").click(function () {
+				web3.eth.getAccounts().then(function (accounts) {
+					var d = new Date();
+					var acnt = accounts[0];
+					var rollno = parseInt($("#_rollnoA").val());
+					return contract.methods.addAttendance(rollno).send({ from: acnt })
+						.then(function (trx) {
+
+							alert("Attendance updated for " + d);
+							console.log(trx);
+
+						});
+				})
+			});
+
+			//View Attendance
+
+			$("#_viewAttendance").click(function () {
+
+				// var rollno = parseInt($("#_rollnoV").val());
+				// console.log(rollno);
+				// contract.methods.viewStudent(rollno).call(function (err, res) {
+				// 	if (err) {
+				// 		console.log("An error occured", err)
+				// 		return
+				// 	}
+				// 	console.log("The rollnumber is: ", res);
+				// 	// $("#_rollno").val(res[0]);
+				// 	// $("#_name").val(res[1]);
+				// 	// $("#_age").val(res[2]);
+				// 	// $("#_course").val(res[3]);
+				// 	// $("#_attendence").val(res[4]);
+				// })
+
+
+				var rollno = parseInt($("#_rollnoView").val());
+				console.log(rollno);
+				contract.methods.viewAttendance(rollno).call(function (err, res) {
+					if (err) {
+						console.log("An error occured", err)
+						return
+					}
+					console.log("The rollnumber is: ", res);
+					$("#_nameView").val(res[1]);
+					$("#_attendanceView").val(res[2]);
+
+				})
+			}
+
+			);
+
+			// add Admin
+			$("#_addAdmin").click(function () {
+
+				web3.eth.getAccounts().then(function (accounts) {
+					var acnt = accounts[0];
+					var address = $("#_address").val();
+
+					return contract.methods.addAdmin(address).send({ from: acnt })
+						.then(function (trx) {
+							$("#_address").val(" ");
+							alert("Admin added Successfully");
+							console.log(trx);
+
+						});
+				})
+			});
+		})
+
+	</script>
+</head>
+
+<!-- <body>
+
+    
+                    <label for="AddStudentHeading" style="font-size: medium;font-style: italic;">Add
+                        Student</label><br><br>
+                    <label for="sid">Student Id</label>
+                    &nbsp;&nbsp;<input type="text" id="_rollno" name="sid"><br><br>
+
+                    <label for="name">Student Name</label>
+                    &nbsp;&nbsp;<input type="text" id="_name" name="sname"><br><br>
+
+                    <label for="scourse">Course</label>
+                    &nbsp;&nbsp;<input type="text" id="_course" name="course"><br><br>
+
+                    <label for="age">Age</label>
+                    &nbsp;&nbsp;<input type="text" id="_age" name="age"><br><br>
+
+                    <label for="attendence">Attendence</label>
+                    &nbsp;&nbsp;<input type="text" id="_attendence" name="attendence"><br><br>
+
+                    <input type="submit" value="Add" id="_addStud">
+
+
+			
+                    <label for="ViewStudentHeading" style="font-size: medium;font-style: italic;">View
+                        Student</label><br><br>
+                    <label for="rollno">Student Id</label>
+                    &nbsp;&nbsp;<input type="text" id="_rollno2" name="sid"><br><br>
+
+					<input type="submit" value="View" id="_viewStud"> -->
+
+
+
+
+<body style="text-align: center;	margin-left: 70px;background-color: rgb(255, 255, 255);">
+	<h1 style="text-align: center;font-family: Georgia;font-weight: 17px;font-size:50px;color :maroon">Blockchain Based Attendence System</h1>
+	<div style="background-color:black;width:500px ;margin-left:335px ;border:10px solid darkkhaki;"><br>
+		<label class="mainHeading" style="color: cornsilk;">
+			Add Student
+		</label>
+		<br><br>
+
+		<label for="RollNo" style="color: darkkhaki;">Student id</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<input type="text" id="_rollno"><br><br>
+
+		<label for="Name " style="color: darkkhaki;">Student Name</label>
+		&nbsp;&nbsp;<input type="text" id="_name"><br><br>
+
+		<label for="Course" style="color: darkkhaki;">Course</label>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<input type="text" id="_course"><br><br>
+
+		<label for="Age" style="color: darkkhaki;">Age</label>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<input type="text" id="_age"><br><br>
+
+		<label for="Attendence" style="color: darkkhaki;">Attendence</label>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<input type="text" id="_attendence"><br><br>
+		<input style="width: 80px;" type="submit" value="Add" id="_addStudent"> &nbsp; &nbsp;
+		<input style="width: 100px;" type="submit" value="View" id="_viewStudent">
+
+		<br><br>
+		</div>
+
+
+
+		<br><br>
+		<!-- //Add Attendance -->
+		<div style="background-color:rgba(204, 185, 134, 0.822);width:500px ;margin-left:335px ;border:10px solid teal"> <br><br>
+		
+		
+		<label class="mainHeading" style="color:teal">
+			Add Attendence
+		</label><br><br>
+
+		<label for="RollNo" style="color:teal">Roll No</label>&nbsp;&nbsp;&nbsp;&nbsp;
+		<input type="text" id="_rollnoA"><br><br>
+		<input style="width: 100px;" type="submit" value="Add" id="_addAttendence">
+		<br><br>
+		</div>
+
+		<!-- View Addendance -->
+		<br><br>
+		<div style="background-color:rgb(157, 214, 179);width:500px ;margin-left:335px ;border:10px solid rgb(255, 124, 1);"><br>
+		
+		<label class="mainHeading">
+			View Attendence
+		</label><br><br>
+
+		<label for="RollNo">Student Id</label>&nbsp;&nbsp;&nbsp;&nbsp;
+		<input type="text" id="_rollnoView"><br><br>
+		
+		<label for="Name">Name</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<input type="text" id="_nameView"><br><br>
+		<label for="RollNo">Attendance</label>&nbsp;&nbsp;&nbsp;
+		<input type="text" id="_attendanceView"><br><br>
+		<input style="width: 150px;" type="submit" value="View Attendance" id="_viewAttendance"><br><br><br>
+		</div>
+
+
+		<br><br>
+		<div style="background-color:rgb(170, 170, 170);width:500px ;margin-left:335px ;border:10px solid rgb(0, 160, 85);"><br>
+
+		
+
+
+		<label class="mainHeading">
+			Add Admin
+		</label><br><br>
+		<label for="Address">Address</label>
+		&nbsp;
+		<input type="text" id="_address"><br><br>
+		<input style="width: 150px;" type="submit" value="Add" id="_addAdmin">
+		<br><br>
+		</div>
+
+
+		<!-- <form id="viewAdmin"><br><br>
+							<label class="mainHeading">
+								View Admin
+							</label><br><br>
+					
+							<label for="AdminID">Admin Id</label>&nbsp;&nbsp;
+							<input type="text" id="_adminidV"><br><br>
+					
+							<input style="width: 100px;" type="submit" value="View" id="_viewAdmin">
+						</form> <br><br> -->
+</body>
+
+
+<!-- </body> -->
+
+</html>
